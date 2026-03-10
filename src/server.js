@@ -5,14 +5,17 @@ const cookieParser = require("cookie-parser");
 const http = require("http");
 const { Server } = require("socket.io");
 const dotenv = require("dotenv");
+
+// Load environment variables before importing modules that depend on them
+// Use override:true so .env wins over any system-level vars
+dotenv.config({ override: true });
+
 const { connectDB } = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const shopRoutes = require("./routes/shopRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
-
-dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
