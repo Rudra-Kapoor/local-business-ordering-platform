@@ -1,8 +1,9 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/local-business-ordering";
+const MONGO_URI =
+  process.env.MONGO_URI || "mongodb://localhost:27017/local-business-ordering";
 
-export const connectDB = async () => {
+const connectDB = async () => {
   try {
     await mongoose.connect(MONGO_URI, {
       dbName: "local-business-ordering",
@@ -13,4 +14,6 @@ export const connectDB = async () => {
     process.exit(1);
   }
 };
+
+module.exports = { connectDB };
 
