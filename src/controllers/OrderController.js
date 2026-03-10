@@ -86,6 +86,15 @@ const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
+    // Emit real-time update events to user and shop rooms
+    const io = req.app.get("io");
+    if (io) {
+      const userRoom = `user:${order.userId}`;
+      const shopRoom = `shop:${order.shopId}`;
+      io.to(userRoom).emit("orderUpdated", order);
+      io.to(shopRoom).emit("orderUpdated", order);
+    }
+
     return res.json(order);
   } catch (err) {
     console.error("Update order status error", err);
