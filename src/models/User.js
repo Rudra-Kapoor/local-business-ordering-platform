@@ -29,11 +29,18 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
+// Hash password before saving user
+userSchema.pre("save", function (next) {
   if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+
+  bcrypt
+    .genSalt(10)
+    .then((salt) => bcrypt.hash(this.password, salt))
+    .then((hash) => {
+      this.password = hash;
+      next();
+    })
+    .catch((err) => next(err));
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
