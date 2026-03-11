@@ -72,3 +72,22 @@ export type Order = {
   updatedAt: string;
 };
 
+export type OrderChatMessage = {
+  _id: string;
+  orderId: string;
+  shopId: string;
+  customerId: string;
+  senderId:
+    | string
+    | {
+        _id: string;
+        name: string;
+        email: string;
+        role: Role;
+      };
+  senderRole: "customer" | "shopOwner";
+  message: string;
+  createdAt: string;
+  updatedAt: string;
+};
+

@@ -1,6 +1,7 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Shop = require("../models/Shop");
+const ChatMessage = require("../models/ChatMessage");
 
 const createOrder = async (req, res) => {
   try {
@@ -142,11 +143,87 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+const getOrderChat = async (req, res) => {
+  try {
+    const { id } = req.params; // orderId
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    const isCustomer =
+      req.user.role === "customer" &&
+      String(order.userId) === String(req.user._id);
+    const isOwner =
+      req.user.role === "shopOwner" &&
+      (await Shop.exists({ _id: order.shopId, ownerId: req.user._id }));
+
+    if (!isCustomer && !isOwner) return res.status(403).json({ message: "Forbidden" });
+
+    const messages = await ChatMessage.find({ orderId: id })
+      .populate("senderId", "name email role")
+      .sort({ createdAt: 1 });
+
+    return res.json({ orderId: String(order._id), messages });
+  } catch (err) {
+    console.error("Get order chat error", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+const postOrderChat = async (req, res) => {
+  try {
+    const { id } = req.params; // orderId
+    const { message } = req.body;
+    if (!message || !String(message).trim()) {
+      return res.status(400).json({ message: "message is required" });
+    }
+
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    const isCustomer =
+      req.user.role === "customer" &&
+      String(order.userId) === String(req.user._id);
+    const isOwner =
+      req.user.role === "shopOwner" &&
+      (await Shop.exists({ _id: order.shopId, ownerId: req.user._id }));
+
+    if (!isCustomer && !isOwner) return res.status(403).json({ message: "Forbidden" });
+
+    const doc = await ChatMessage.create({
+      orderId: order._id,
+      shopId: order.shopId,
+      customerId: order.userId,
+      senderId: req.user._id,
+      senderRole: req.user.role,
+      message: String(message).trim(),
+    });
+
+    const full = await ChatMessage.findById(doc._id).populate(
+      "senderId",
+      "name email role"
+    );
+
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`order:${order._id}`).emit("chatMessage", full);
+      io.to(`user:${order.userId}`).emit("chatMessage", full);
+      io.to(`shop:${order.shopId}`).emit("chatMessage", full);
+    }
+
+    return res.status(201).json(full);
+  } catch (err) {
+    console.error("Post order chat error", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   createOrder,
   getMyOrders,
   getShopOrders,
   getOwnerOrders,
+  getOrderChat,
+  postOrderChat,
   updateOrderStatus,
 };
 

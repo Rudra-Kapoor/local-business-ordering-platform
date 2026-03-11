@@ -4,6 +4,8 @@ const {
   getMyOrders,
   getShopOrders,
   getOwnerOrders,
+  getOrderChat,
+  postOrderChat,
   updateOrderStatus,
 } = require("../controllers/OrderController");
 const { auth, authorize } = require("../middleware/auth");
@@ -28,6 +30,10 @@ router.patch(
   authorize("shopOwner"),
   updateOrderStatus
 );
+
+// Order chat: allowed for order's customer and shop's owner
+router.get("/:id/chat", auth, getOrderChat);
+router.post("/:id/chat", auth, postOrderChat);
 
 module.exports = router;
 

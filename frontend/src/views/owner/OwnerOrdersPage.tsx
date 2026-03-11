@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { api } from "../../lib/api";
@@ -11,6 +11,7 @@ import { formatDateTime, formatMoney } from "../../lib/utils";
 import { useToast } from "../../components/ui/Toast";
 import { useAuth } from "../../state/auth";
 import { getSocket } from "../../lib/socket";
+import { OrderChatBox } from "../../components/chat/OrderChatBox";
 
 const statusOptions: OrderStatus[] = [
   "pending",
@@ -47,6 +48,7 @@ export function OwnerOrdersPage() {
   const { shopId } = useParams();
   const { push } = useToast();
   const qc = useQueryClient();
+  const [openOrderId, setOpenOrderId] = useState<string | null>(null);
 
   const ordersQuery = useQuery({
     queryKey: ["shopOrders", { shopId }],
@@ -140,6 +142,13 @@ export function OwnerOrdersPage() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setOpenOrderId((cur) => (cur === o._id ? null : o._id))}
+                >
+                  {openOrderId === o._id ? "Close chat" : "Chat"}
+                </Button>
                 <Badge tone={statusTone(o.status)}>{o.status}</Badge>
                 <Badge tone="neutral">{o.paymentStatus}</Badge>
               </div>
@@ -158,6 +167,9 @@ export function OwnerOrdersPage() {
               <div className="text-sm text-slate-700">
                 Delivery: <span className="font-medium text-slate-900">{o.deliveryAddress || "—"}</span>
               </div>
+              {openOrderId === o._id ? (
+                <OrderChatBox orderId={o._id} title="Chat with customer" />
+              ) : null}
               <div className="rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Items

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/api";
 import type { Order } from "../../lib/types";
@@ -8,6 +8,8 @@ import { EmptyState } from "../../components/ui/EmptyState";
 import { formatDateTime, formatMoney } from "../../lib/utils";
 import { useAuth } from "../../state/auth";
 import { getSocket } from "../../lib/socket";
+import { Button } from "../../components/ui/Button";
+import { OrderChatBox } from "../../components/chat/OrderChatBox";
 
 function statusTone(status: Order["status"]) {
   switch (status) {
@@ -28,6 +30,7 @@ function statusTone(status: Order["status"]) {
 export function MyOrdersPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const [openOrderId, setOpenOrderId] = useState<string | null>(null);
 
   const ordersQuery = useQuery({
     queryKey: ["myOrders"],
@@ -90,7 +93,16 @@ export function MyOrdersPage() {
             <Card key={o._id}>
               <CardHeader className="flex flex-row items-center justify-between gap-3">
                 <CardTitle>Order #{o._id.slice(-6).toUpperCase()}</CardTitle>
-                <Badge tone={statusTone(o.status)}>{o.status}</Badge>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setOpenOrderId((cur) => (cur === o._id ? null : o._id))}
+                  >
+                    {openOrderId === o._id ? "Close chat" : "Chat"}
+                  </Button>
+                  <Badge tone={statusTone(o.status)}>{o.status}</Badge>
+                </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-slate-700">
@@ -123,6 +135,9 @@ export function MyOrdersPage() {
                   <div className="text-sm text-slate-700">
                     Delivery: <span className="font-medium text-slate-900">{o.deliveryAddress}</span>
                   </div>
+                ) : null}
+                {openOrderId === o._id ? (
+                  <OrderChatBox orderId={o._id} title="Chat with shop" />
                 ) : null}
               </CardContent>
             </Card>
