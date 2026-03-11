@@ -83,9 +83,9 @@ export function AppLayout() {
         <aside className="md:sticky md:top-[72px] md:self-start">
           <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200">
             <nav className="flex flex-col gap-1">
-              <NavItem to="/shops" label="Shops" end />
               {user?.role === "customer" ? (
                 <>
+                  <NavItem to="/shops" label="Shops" end />
                   <NavItem to="/cart" label={`Cart (${items.length})`} />
                   <NavItem to="/orders" label="My orders" />
                 </>
