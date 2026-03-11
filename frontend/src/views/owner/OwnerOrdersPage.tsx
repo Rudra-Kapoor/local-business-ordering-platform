@@ -221,7 +221,7 @@ export function OwnerOrdersPage() {
         ))}
       </div>
     );
-  }, [ordersQuery.data, ordersQuery.error, ordersQuery.isError, ordersQuery.isLoading, updateStatus, shopId]);
+  }, [ordersQuery.data, ordersQuery.error, ordersQuery.isError, ordersQuery.isLoading, updateStatus]);
 
   if (user?.role !== "shopOwner") {
     return <EmptyState title="Shop owner only" description="This page is for shop owners." />;

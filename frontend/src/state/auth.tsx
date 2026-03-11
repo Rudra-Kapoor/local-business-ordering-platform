@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import { api, setAuthToken } from "../lib/api";
 import { getToken, setToken } from "../lib/storage";
