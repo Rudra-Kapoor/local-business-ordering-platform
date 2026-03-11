@@ -97,6 +97,7 @@ export function AppLayout() {
                     Owner
                   </div>
                   <NavItem to="/owner/shops" label="My shops" />
+                  <NavItem to="/owner/orders" label="All orders" />
                 </>
               ) : null}
               {user?.role === "admin" ? (

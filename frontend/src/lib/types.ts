@@ -43,8 +43,21 @@ export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
 
 export type Order = {
   _id: string;
-  userId: string;
-  shopId: string;
+  userId:
+    | string
+    | {
+        _id: string;
+        name: string;
+        email: string;
+      };
+  shopId:
+    | string
+    | {
+        _id: string;
+        shopName: string;
+        category: string;
+        location: { address: string; latitude?: number; longitude?: number };
+      };
   products: Array<{
     productId: string;
     name: string;

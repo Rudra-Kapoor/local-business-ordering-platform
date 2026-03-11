@@ -3,6 +3,7 @@ const {
   createOrder,
   getMyOrders,
   getShopOrders,
+  getOwnerOrders,
   updateOrderStatus,
 } = require("../controllers/OrderController");
 const { auth, authorize } = require("../middleware/auth");
@@ -20,6 +21,7 @@ router.get(
   authorize("shopOwner"),
   getShopOrders
 );
+router.get("/owner/mine", auth, authorize("shopOwner"), getOwnerOrders);
 router.patch(
   "/:id/status",
   auth,

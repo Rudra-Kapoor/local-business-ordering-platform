@@ -10,6 +10,7 @@ import { MyOrdersPage } from "./views/customer/MyOrdersPage";
 import { OwnerShopsPage } from "./views/owner/OwnerShopsPage";
 import { OwnerProductsPage } from "./views/owner/OwnerProductsPage";
 import { OwnerOrdersPage } from "./views/owner/OwnerOrdersPage";
+import { OwnerAllOrdersPage } from "./views/owner/OwnerAllOrdersPage";
 import { AdminShopsPage } from "./views/admin/AdminShopsPage";
 import type { Role } from "./lib/types";
 import { Spinner } from "./components/ui/Spinner";
@@ -120,6 +121,14 @@ function App() {
           element={
             <RequireRole roles={["shopOwner"]}>
               <OwnerShopsPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/owner/orders"
+          element={
+            <RequireRole roles={["shopOwner"]}>
+              <OwnerAllOrdersPage />
             </RequireRole>
           }
         />

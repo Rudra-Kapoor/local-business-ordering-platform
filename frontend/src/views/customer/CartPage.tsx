@@ -14,17 +14,19 @@ export function CartPage() {
   const { shop, items, setQty, remove, clear, total } = useCart();
   const { push } = useToast();
   const [deliveryAddress, setDeliveryAddress] = useState("");
+  const addressOk = deliveryAddress.trim().length >= 6;
 
   const createOrder = useMutation({
     mutationFn: async () => {
       if (!shop) throw new Error("Missing shop");
+      if (!addressOk) throw new Error("Delivery address is required");
       const res = await api.post<Order>("/orders", {
         shopId: shop._id,
         items: items.map((i) => ({
           productId: i.product._id,
           quantity: i.quantity,
         })),
-        deliveryAddress: deliveryAddress.trim() || undefined,
+        deliveryAddress: deliveryAddress.trim(),
       });
       return res.data;
     },
@@ -98,10 +100,11 @@ export function CartPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Input
-              label="Delivery address (optional)"
+              label="Delivery address"
               placeholder="House no, street, landmark…"
               value={deliveryAddress}
               onChange={(e) => setDeliveryAddress(e.target.value)}
+              hint="Required to place an order"
             />
             <div className="flex items-center justify-between text-sm">
               <div className="text-slate-600">Total</div>
@@ -110,6 +113,7 @@ export function CartPage() {
             <Button
               className="w-full"
               isLoading={createOrder.isPending}
+              disabled={!addressOk}
               onClick={() => createOrder.mutate()}
             >
               Place order

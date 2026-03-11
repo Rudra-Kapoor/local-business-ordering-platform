@@ -38,6 +38,10 @@ function statusTone(status: OrderStatus) {
   }
 }
 
+function asUser(order: Order) {
+  return typeof order.userId === "string" ? null : order.userId;
+}
+
 export function OwnerOrdersPage() {
   const { user } = useAuth();
   const { shopId } = useParams();
@@ -141,6 +145,19 @@ export function OwnerOrdersPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
+              {(() => {
+                const u = asUser(o);
+                if (!u) return null;
+                return (
+                  <div className="text-sm text-slate-700">
+                    Customer: <span className="font-medium text-slate-900">{u.name}</span>{" "}
+                    <span className="text-slate-500">({u.email})</span>
+                  </div>
+                );
+              })()}
+              <div className="text-sm text-slate-700">
+                Delivery: <span className="font-medium text-slate-900">{o.deliveryAddress || "—"}</span>
+              </div>
               <div className="rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Items
